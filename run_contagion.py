@@ -55,10 +55,28 @@ def run_contagion_poisson(n: int, seed: int, z: float, capital_buffer: float, q:
 def run_contagion_scale_free(n: int, seed: int, z: int, pow: float, capital_buffer: float, q: float) -> int:
     if(z==0):
         return 1
+
+    '''
     a = min(1/(2*z), 0.49)
     b = 1 - 2*a
     delta = max(( pow*(1-a) - 2 + a )/(2*a), 0 )
     G = nx.scale_free_graph(n, alpha=a, beta=b, gamma=a, delta_in=delta, delta_out=delta, seed=seed) #this creates parallel edges...
+    G = nx.DiGraph(G)
+    G.remove_edges_from(nx.selfloop_edges(G))
+    '''
+
+
+    G1 = nx.barabasi_albert_graph(n, int(z), seed=seed)
+    G = nx.DiGraph()
+    G.add_nodes_from(range(n))
+    for e in G1.edges():
+        (a, b) = e
+        if np.random.randint(low=0, high=2) == 0:
+            G.add_edge(a, b)
+        else:
+            G.add_edge(b, a)
+
+
     list_nodes = []
 
     for i in range(n):
@@ -76,7 +94,10 @@ def run_contagion_scale_free(n: int, seed: int, z: int, pow: float, capital_buff
         list_nodes[i].interbank_liability = il
         list_nodes[i].deposits = (list_nodes[i].interbank_asset + list_nodes[i].external_assets)*(1 - capital_buffer) - il
 
-    first_fail = np.random.randint(low=0, high=n)
+    max_grade = max(G.degree, key=lambda x: x[1])[1]
+    max_grade_nodes_list = [node[0] for node in G.degree if node[1] == max_grade]
+    first_fail = max_grade_nodes_list[np.random.randint(low=0, high=len(max_grade_nodes_list))]
+    #first_fail = np.random.randint(low=0, high=n)
     queue = deque([])
     queue.append(first_fail)
     # first bank to fail

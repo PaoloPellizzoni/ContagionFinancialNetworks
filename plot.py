@@ -23,7 +23,7 @@ step = 0.5
 interval_z = np.arange(0, 20, step)
 interval_cb = np.arange(0, 0.1, step/100)
 
-with open('data_compl_s05_it100.npy', 'rb') as f:
+with open('data/data_compl_s05_it100.npy', 'rb') as f:
     count_systemic = np.load(f)
     avg_failed = np.load(f)
     avg_failed_coditioned = np.load(f)

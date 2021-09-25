@@ -15,7 +15,7 @@ def main():
     n = 1000
     q = 1
     percentage_for_systemic = 0.05
-    n_iters = 20
+    n_iters = 100
     step = 1
     interval_z = np.arange(0, 20, step)
     interval_cb = np.arange(0, 0.1, step/100)
